@@ -7,59 +7,35 @@ average number of flips per trial needed for the sequence to contain both heads 
 import random
 
 
-# def simulate(num_of_flips):
-#
-#     flips = 0
-#     results = []
-#
-#     while flips < num_of_flips:
-#         results.append(random.choice(['heads', 'tails']))
-#         flips += 1
-#
-#     count = 1
-#     for i in range(len(results)):
-#         if results[i] == results[i + 1]:
-#             count += 1
-#         else:
-#             break
+def flip_coin():
+    if random.choice(['heads', 'tails']) == 'heads':
+        return "heads"
+    else:
+        return "tails"
 
-# 1. rzucam aż wypadnie przeciwna strona i liczę rzuty
-# 2. robię to x razy
 
-def simulate(num_of_flips):
-
+def simulate(trials):
     flips = 0
-    results = []
+    trial = 0
 
-    while flips < num_of_flips:
-        results.append(random.choice(['heads', 'tails']))
-        flips += 1
+    while trial < trials:
+        if flip_coin() == 'heads':
+            flips += 1
+            while flip_coin() == 'heads':
+                flips += 1
+            flips += 1
 
-    count = 1
-    for i in range(len(results)):
-        if results[i] == results[i + 1]:
-            count += 1
         else:
-            break
+            flips += 1
+            while flip_coin() == 'tails':
+                flips += 1
+            flips += 1
+        trial += 1
+
+    avg_flips = (flips) / trials
+    print(f"On average {avg_flips} flips are needed for the sequence to contain both heads and tails if you run "
+          f"{trials:,.0f} trials.")
+    return avg_flips
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+simulate(10000)
