@@ -12,7 +12,21 @@ On the last round, you stop only at cat #100.
 Write a program which outputs which cats have hats at the end.
 """
 
-# 100 cats,
-# 100 rounds
-# first round - add a hat to each cat
+
+def divisor(number):
+    return [item for item in range(2, number + 1) if number % item == 0]
+
+
+cats = {num: "" for num in range(1, 101)}
+
+for key in cats.keys():
+    if len(divisor(key)) % 2 == 0:
+        cats[key] = True
+    elif len(divisor(key)) % 2 != 0:
+        cats[key] = False
+
+for key, value in cats.items():
+    if value:
+        print(f"Cat #{key} has a hat")
+
 
