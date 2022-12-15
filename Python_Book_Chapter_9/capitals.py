@@ -1,3 +1,7 @@
+"""
+Challenge 9.7
+"""
+
 import random
 
 
