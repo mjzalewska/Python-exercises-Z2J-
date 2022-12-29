@@ -88,4 +88,9 @@ print(Clara.make_sound())
 print(Clara.get_hungry(5))
 print(Clara.eat(grass))
 
-
+Mandy = Chicken('chicken', 'Mandy', 1.5, 10)
+print(Mandy)
+print(Mandy.move('runs', 15))
+print(Mandy.make_sound())
+print(Mandy.get_hungry(30))
+print(Mandy.eat(corn))
