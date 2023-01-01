@@ -43,14 +43,14 @@ class Person:
 
 
 class Employee(Person):
-    empl_counter = 1
+    employee_counter = 1
 
     def __init__(self, role='', salary=0, **kwargs):
         super().__init__(**kwargs)
         self.role = role
         self.salary = salary
-        self.employee_id = self.__class__.empl_counter
-        self.__class__.empl_counter += 1
+        self.employee_id = self.__class__.employee_counter
+        self.__class__.employee_counter += 1
 
     def __str__(self):
         return f"--Employee file--\nEmployee_ID: {self.employee_id}\nName: {self.last_name}, {self.first_name}\nDOB:" \
@@ -58,9 +58,6 @@ class Employee(Person):
 
     def change_role(self, new_role):
         self.role = new_role
-
-    def get_current_salary(self):
-        return self.salary
 
     def change_salary(self, new_salary):
         self.salary = new_salary
@@ -74,18 +71,16 @@ class Teacher(Employee):
         Headmaster.subordinates[self.__class__.__name__].append(self.last_name + ', ' + self.first_name)
 
     def add_course(self, course_name):
-        try:
-            if course_name not in self.courses:
-                self.courses.append(course_name)
-        except:
-            raise Exception(f"Sorry {course_name} is already on the list")
+        if course_name not in self.courses:
+            self.courses.append(course_name)
+        else:
+            print(f"Sorry {course_name} is already on the list!")
 
     def remove_course(self, course_name):
-        try:
-            if len(self.courses) > 1:
-                self.courses.remove(course_name)
-        except:
-            raise Exception("Error! At lease one course must be assigned to each teacher!")
+        if len(self.courses) > 1:
+            self.courses.remove(course_name)
+        else:
+            print("Error! At lease one course must be assigned to each teacher!")
 
 
 class SupportStaff(Employee):
@@ -114,56 +109,66 @@ class Student(Person):
         self.grade_book = {course: [] for course in self.courses}
 
     def __str__(self):
-        return f"--Student File--\nName:{self.last_name}, {self.first_name}\nDOB:{self.dob}\n Year: {self.year}\n" \
-               f"Courses: {list(self.grade_book.keys())}, Grades: {self.grade_book}, CPA: {self.get_gpa()}"
-
-    def get_current_year(self):
-        return self.year
+        return f"--Student File--\nName:{self.last_name}, {self.first_name}\nDOB:{self.dob}\nYear: {self.year}\n" \
+               f"Courses: {','.join(list(self.grade_book.keys()))}\nGrades: {self.grade_book}\nGPA: {self.get_gpa()}"
 
     def add_grade(self, course, grade):
-        try:
-            if 0 < grade < 100:
-                self.grade_book[course].append(grade)
-        except:
-            raise Exception("Error! Please specify a value in range 0-100")
+        if 0 <= grade <= 100:
+            self.grade_book[course].append(grade)
+        else:
+            print("Error! Please specify a value in range 0-100")
 
     def get_gpa(self):
-        return sum(list(self.grade_book.values())) / len(list(self.grade_book.values()))
+        total = 0
+        count = 0
+        for item in list(self.grade_book.values()):
+            for i in range(len(item)):
+                total += item[i]
+                count += len(item)
+        gpa = round(total / count, 0)
+        return gpa
 
-    def add_course(self, course):
-        try:
-            if course not in self.courses:
-                self.courses.append(course)
-                self.grade_book.update((course, []))
+    def add_course(self, new_course, course):
+        if new_course not in self.courses:
+            self.courses.append(new_course)
+            self.grade_book[new_course]=[]
+            course.students.append(self.last_name + ', ' + self.first_name)
+        else:
+            print("Error!Course already added!")
 
-        except:
-            raise Exception("Error!Course already on the list")
+    def remove_course(self, course):
+        if course.name in self.courses:
+            self.courses.remove(course.name)
+            self.grade_book.pop(course.name)
+            course.students.remove(self.last_name + ', ' + self.first_name)
+        else:
+            print(f"Error! {course.name} is not on the list!")
 
-    def get_courses(self):
-        return ''.join(self.courses)
+    def list_courses(self):
+        return '\n'.join(self.courses)
 
 
 class Course:
-    def __init__(self, name, max_students):
+    def __init__(self, name, max_students, time):
         self.name = name
         self.max_student = max_students
         self.students = []
+        self.time = time
+
+    def add_to_schedule(self, classroom):
+        if not classroom.schedule[self.time]:
+            classroom.schedule[self.time] = self.name
+        else:
+            print("Error! Time slot occupied. Choose another slot or room!")
 
     def add_student(self, student):
-        try:
-            if len(self.students) < self.max_student:
-                self.students.append(student)
-        except:
-            raise Exception("Error! Maximum course capacity exceeded")
+        if len(self.students) < self.max_student:
+            self.students.append(student.last_name+', '+student.first_name)
+        else:
+            print("Error! Maximum course capacity exceeded")
 
     def get_student_list(self):
         return '\n'.join(self.students)
-
-    def get_avg_grade(self):
-        total = 0
-        for student in self.students:
-            total += student.grade_book[self.name]
-        return total / len(self.students)
 
 
 class Room:
@@ -201,12 +206,83 @@ class Toilet(Room):
         super().__init__(**kwargs)
 
 
+# headmaster instance:
+# BreezeA = Headmaster(last_name='Breeze', first_name='Amanda', dob='1990-06-07', role='headmaster', salary=200000)
 
-RobinsonA = Teacher(last_name='Robinson', first_name='Ann', dob='1990-10-01', role='senior teacher', salary=150000,
-                    courses=['Mathematics'])
-SmithB = Teacher(last_name='Smith', first_name='Bill', dob='1991-12-12', role='teacher', salary=170000,
-                 courses=['Latin'])
-Jenkins = SupportStaff(last_name='Jenkins', first_name='Michael', dob='1980-05-01', role='janitor', salary=90000)
-Menora = SupportStaff(last_name='Menora', first_name='Jenna', dob='1999-10-10', role='nurse', salary=100000)
+# teacher instances:
+# RobinsonA = Teacher(last_name='Robinson', first_name='Ann', dob='1990-10-01', role='senior teacher', salary=150000,
+#                     courses=['Mathematics'])
+# SmithB = Teacher(last_name='Smith', first_name='Bill', dob='1991-12-12', role='teacher', salary=170000,
+#                  courses=['Latin'])
+# DionC = Teacher(last_name='Dion', first_name='Celine', dob='1995-04-14', role='junior teacher', salary=100000,
+#                 courses=['English'])
 
-print(Headmaster.subordinates)
+# support staff instances:
+# Jenkins = SupportStaff(last_name='Jenkins', first_name='Michael', dob='1980-05-01', role='janitor', salary=90000)
+# Mendez = SupportStaff(last_name='Mendez', first_name='Jenna', dob='1999-10-10', role='nurse', salary=100000)
+
+# print(Headmaster.subordinates)
+# print(BreezeA.get_age())
+# BreezeA.adjust_surname('Bree')
+# print(BreezeA.get_surname())
+# print(BreezeA.employee_id)
+#
+# print(RobinsonA.employee_id)
+# print(RobinsonA.courses)
+# RobinsonA.add_course('Mathematics')
+# RobinsonA.add_course('Social sciences')
+# print(RobinsonA.courses)
+# RobinsonA.remove_course('Social sciences')
+# print(RobinsonA.courses)
+
+# student instances
+# AfleckM = Student(last_name='Afleck', first_name='Mandy', dob='2008-07-15', year='7',
+#                   courses=['English', 'Mathematics', 'History', 'Social Science'])
+# BradfordL = Student(last_name='Bradford', first_name='Linda', dob='2008-12-15', year='7',
+#                     courses=['English', 'Mathematics', 'Science', 'Pottery'])
+# WachowskiB = Student(last_name='Wachowski', first_name='Brad', dob='2008-05-05', year='7',
+#                      courses=['English', 'Mathematics', 'History', 'Art'])
+# GonzalezA = Student(last_name='Gonzalez', first_name='Adam', dob='2008-01-01', year='7',
+#                     courses=['English', 'Mathematics', 'History', 'Computer Science'])
+
+# GonzalezA.add_grade('History', 90)
+# GonzalezA.add_grade('History', 120)
+# GonzalezA.add_grade('Mathematics', 95)
+# GonzalezA.add_grade('English', 75)
+# GonzalezA.add_grade('Computer Science', 100)
+# print(GonzalezA.grade_book)
+# print(GonzalezA.get_gpa())
+# print(GonzalezA.list_courses())
+# print(GonzalezA)
+# print(GonzalezA.student_id)
+
+# maths_lab = Classroom(floor=1, number=6, room_type='lab', capacity=25)
+# print(maths_lab.schedule)
+# maths = Course(name='Mathematics', max_students=3, time=10)
+# art = Course(name='Art', max_students=10, time=15)
+# pottery = Course(name='Pottery', max_students=5, time=16)
+# maths.add_to_schedule(maths_lab)
+# print(maths_lab.schedule)
+
+# maths.add_student(GonzalezA)
+# maths.add_student(AfleckM)
+# maths.add_student(WachowskiB)
+# print(maths.get_student_list())
+# maths.add_student(BradfordL)
+
+# GonzalezA.add_course('Art', art)
+# GonzalezA.add_course('Pottery', pottery)
+# print(GonzalezA.grade_book)
+# print(GonzalezA.list_courses())
+# print(art.students)
+# print(pottery.students)
+# GonzalezA.remove_course(art)
+# print(GonzalezA.grade_book)
+# print(GonzalezA.list_courses())
+# print(art.students)
+# # AfleckM.add_course('Art', art)
+# print(AfleckM.grade_book)
+# print(AfleckM.list_courses())
+# print(art.students)
+
+
