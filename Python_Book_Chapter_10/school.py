@@ -136,3 +136,30 @@ class Student(Person):
 
     def get_courses(self):
         return ''.join(self.courses)
+
+
+class Course:
+    def __init__(self, name, max_students):
+        self.name = name
+        self.max_student = max_students
+        self.students = []
+
+    def add_student(self, student):
+        try:
+            if len(self.students) < self.max_student:
+                self.students.append(student)
+        except:
+            raise Exception("Error! Maximum course capacity exceeded")
+
+    def get_student_list(self):
+        return '\n'.join(self.students)
+
+    def get_avg_grade(self):
+        total = 0
+        for student in self.students:
+            total += student.grade_book[self.name]
+        return total/len(self.students)
+
+
+
+
