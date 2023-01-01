@@ -65,19 +65,12 @@ class Employee(Person):
     def change_salary(self, new_salary):
         self.salary = new_salary
 
-
-class Headmaster(Employee):
-    subordinates = {}
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
 class Teacher(Employee):
 
     def __init__(self, courses=None, **kwargs):
         super().__init__(**kwargs)
         self.courses = courses
+        Headmaster.subordinates[self.__class__.__name__].append(self.last_name + ', ' + self.first_name)
 
     def add_course(self, course_name):
         try:
@@ -95,7 +88,17 @@ class Teacher(Employee):
 
 
 class SupportStaff(Employee):
-    pass
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Headmaster.subordinates[self.__class__.__name__].append(self.last_name+', '+self.first_name)
+
+
+class Headmaster(Employee):
+    subordinates = {item.__name__:[] for item in Employee.__subclasses__() if item.__name__ != 'Headmaster'}
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Student(Person):
@@ -126,11 +129,12 @@ class Student(Person):
     def get_gpa(self):
         return sum(list(self.grade_book.values())) / len(list(self.grade_book.values()))
 
-    def add_course(self, new_course):
+    def add_course(self, course):
         try:
-            if new_course not in self.courses:
-                self.courses.append(new_course)
-                self.grade_book.update((new_course, []))
+            if course not in self.courses:
+                self.courses.append(course)
+                self.grade_book.update((course, []))
+
         except:
             raise Exception("Error!Course already on the list")
 
@@ -158,8 +162,15 @@ class Course:
         total = 0
         for student in self.students:
             total += student.grade_book[self.name]
-        return total/len(self.students)
+        return total / len(self.students)
 
 
+RobinsonA = Teacher(last_name='Robinson', first_name='Ann', dob='1990-10-01', role='senior teacher', salary=150000,
+                    courses=['Mathematics'])
+SmithB = Teacher(last_name='Smith', first_name='Bill', dob='1991-12-12', role='teacher', salary=170000,
+                 courses=['Latin'])
+Jenkins = SupportStaff(last_name='Jenkins', first_name='Michael', dob='1980-05-01', role='janitor', salary=90000)
+Menora = SupportStaff(last_name='Menora', first_name='Jenna', dob='1999-10-10', role='nurse', salary=100000)
 
 
+print(Headmaster.subordinates)
