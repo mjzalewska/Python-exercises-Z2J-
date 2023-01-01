@@ -65,6 +65,7 @@ class Employee(Person):
     def change_salary(self, new_salary):
         self.salary = new_salary
 
+
 class Teacher(Employee):
 
     def __init__(self, courses=None, **kwargs):
@@ -91,11 +92,11 @@ class SupportStaff(Employee):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        Headmaster.subordinates[self.__class__.__name__].append(self.last_name+', '+self.first_name)
+        Headmaster.subordinates[self.__class__.__name__].append(self.last_name + ', ' + self.first_name)
 
 
 class Headmaster(Employee):
-    subordinates = {item.__name__:[] for item in Employee.__subclasses__() if item.__name__ != 'Headmaster'}
+    subordinates = {item.__name__: [] for item in Employee.__subclasses__() if item.__name__ != 'Headmaster'}
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -165,12 +166,47 @@ class Course:
         return total / len(self.students)
 
 
+class Room:
+    def __init__(self, floor=None, number=None, room_type=None, **kwargs):
+        self.floor = floor
+        self.number = number
+        self.room_type = room_type
+        super().__init__(**kwargs)
+
+
+class Classroom(Room):
+    def __init__(self, capacity=None, **kwargs):
+        super().__init__(**kwargs)
+        self.schedule = {item: '' for item in range(8, 18)}
+        self.capacity = capacity
+
+    def check_schedule(self):
+        return self.schedule
+
+    # add class to schedule when class instantiated
+
+
+class HeadmasterOffice(Room):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class UtilityRoom(Room):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class Toilet(Room):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+
 RobinsonA = Teacher(last_name='Robinson', first_name='Ann', dob='1990-10-01', role='senior teacher', salary=150000,
                     courses=['Mathematics'])
 SmithB = Teacher(last_name='Smith', first_name='Bill', dob='1991-12-12', role='teacher', salary=170000,
                  courses=['Latin'])
 Jenkins = SupportStaff(last_name='Jenkins', first_name='Michael', dob='1980-05-01', role='janitor', salary=90000)
 Menora = SupportStaff(last_name='Menora', first_name='Jenna', dob='1999-10-10', role='nurse', salary=100000)
-
 
 print(Headmaster.subordinates)
