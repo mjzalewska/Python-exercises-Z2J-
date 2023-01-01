@@ -43,18 +43,18 @@ class Person:
 
 
 class Employee(Person):
-    class_counter = 0
+    empl_counter = 1
 
     def __init__(self, role='', salary=0, **kwargs):
         super().__init__(**kwargs)
         self.role = role
         self.salary = salary
-        self.employee_id = self.__class__.class_counter
-        self.__class__.class_counter += 1
+        self.employee_id = self.__class__.empl_counter
+        self.__class__.empl_counter += 1
 
     def __str__(self):
-        return f"--Employee file--\n Employee_ID: {self.employee_id}\nName: {self.last_name}, {self.first_name}\n DOB:" \
-               f" {self.dob}\n Function: {self.role}"
+        return f"--Employee file--\nEmployee_ID: {self.employee_id}\nName: {self.last_name}, {self.first_name}\nDOB:" \
+               f" {self.dob}\nFunction: {self.role}"
 
     def change_role(self, new_role):
         self.role = new_role
@@ -67,7 +67,10 @@ class Employee(Person):
 
 
 class Headmaster(Employee):
-    pass
+    subordinates = {}
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Teacher(Employee):
@@ -79,7 +82,7 @@ class Teacher(Employee):
     def add_course(self, course_name):
         try:
             if course_name not in self.courses:
-                self.courses = list().append(course_name)
+                self.courses.append(course_name)
         except:
             raise Exception(f"Sorry {course_name} is already on the list")
 
@@ -89,3 +92,47 @@ class Teacher(Employee):
                 self.courses.remove(course_name)
         except:
             raise Exception("Error! At lease one course must be assigned to each teacher!")
+
+
+class SupportStaff(Employee):
+    pass
+
+
+class Student(Person):
+    student_counter = 1
+
+    def __init__(self, year='', courses=None, **kwargs):
+        super().__init__(**kwargs)
+        self.student_id = self.__class__.student_counter
+        self.__class__.student_counter += 1
+        self.year = year
+        self.courses = courses
+        self.grade_book = {course: [] for course in self.courses}
+
+    def __str__(self):
+        return f"--Student File--\nName:{self.last_name}, {self.first_name}\nDOB:{self.dob}\n Year: {self.year}\n" \
+               f"Courses: {list(self.grade_book.keys())}, Grades: {self.grade_book}, CPA: {self.get_gpa()}"
+
+    def get_current_year(self):
+        return self.year
+
+    def add_grade(self, course, grade):
+        try:
+            if 0 < grade < 100:
+                self.grade_book[course].append(grade)
+        except:
+            raise Exception("Error! Please specify a value in range 0-100")
+
+    def get_gpa(self):
+        return sum(list(self.grade_book.values())) / len(list(self.grade_book.values()))
+
+    def add_course(self, new_course):
+        try:
+            if new_course not in self.courses:
+                self.courses.append(new_course)
+                self.grade_book.update((new_course, []))
+        except:
+            raise Exception("Error!Course already on the list")
+
+    def get_courses(self):
+        return ''.join(self.courses)
