@@ -20,35 +20,42 @@ class PdfFileSplitter:
             try:
                 pdf_reader = PdfReader(str(self.path))
                 self.writer_1 = pdf_reader.pages[:break_point + 1]
-                self.writer_2 = pdf_reader.pages[break_point:]
+                self.writer_2 = pdf_reader.pages[break_point+1:]
+
+            except TypeError:
+                print("Please provide an integer value for the break_point argument")
 
             except FileNotFoundError:
                 file_name = str(self.path).split("\\")[-1]
                 print(f"{file_name} has not been found or is a directory")
 
+            # TimeoutError exception added due to the usage of rglob (recursive glob method)
             except TimeoutError:
                 print("The operation has timed out. Please try again")
         else:
-            raise TypeError(f"Please provide the required positional argument: break_point")
+            raise TypeError
 
     def write(self, target_file_name):
         if target_file_name:
-            pdf_writer_1 = PdfWriter()
-            pdf_writer_2 = PdfWriter()
+            try:
+                pdf_writer_1 = PdfWriter()
+                pdf_writer_2 = PdfWriter()
 
-            for page in self.writer_1:
-                pdf_writer_1.add_page(page)
-            with open(target_file_name + "_1.pdf", 'wb') as target_file_1:
-                pdf_writer_1.write(target_file_1)
+                for page in self.writer_1:
+                    pdf_writer_1.add_page(page)
+                with open(str(target_file_name) + "_1.pdf", 'wb') as target_file_1:
+                    pdf_writer_1.write(target_file_1)
 
-            for page in self.writer_2:
-                pdf_writer_2.add_page(page)
-            with open(target_file_name + "_2.pdf", 'wb') as target_file_2:
-                pdf_writer_2.write(target_file_2)
+                for page in self.writer_2:
+                    pdf_writer_2.add_page(page)
+                with open(str(target_file_name) + "_2.pdf", 'wb') as target_file_2:
+                    pdf_writer_2.write(target_file_2)
+            except TypeError:
+                pass
         else:
-            raise TypeError(f"Please provide the required positional argument: target_file_name")
+            raise TypeError
 
 
-pdf_splitter = PdfFileSplitter('Pride_and_Prejudice.pdf')
+pdf_splitter = PdfFileSplitter("Pride_and_Prejudice.pdf")
 pdf_splitter.split(150)
-pdf_splitter.write()
+pdf_splitter.write("PP")
