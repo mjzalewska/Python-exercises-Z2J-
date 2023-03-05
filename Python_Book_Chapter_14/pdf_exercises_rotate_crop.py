@@ -115,30 +115,43 @@ from PyPDF2 import PdfReader, PdfWriter
 #     pdf_writer.write(output_f)
 
 # 2
-pdf_path = Path().home() / "PycharmProjects"/"Python-exercises-Z2J-"/"Python_Book_Chapter_14"/"rotated.pdf"
-pdf_reader = PdfReader(str(pdf_path))
-
-left_side_p1 = copy.deepcopy(pdf_reader.pages[0])
-right_side_p1 = copy.deepcopy(pdf_reader.pages[0])
-left_side_p2 = copy.deepcopy(pdf_reader.pages[1])
-right_side_p2 = copy.deepcopy((pdf_reader.pages[1]))
-
-current_coords = left_side_p1.mediabox.upper_right
-new_coords = (current_coords[0]/2, current_coords[1])
-
-left_side_p1.mediabox.upper_right = new_coords
-right_side_p1.mediabox.upper_left = new_coords
-left_side_p2.mediabox.upper_right = new_coords
-right_side_p2.mediabox.upper_left = new_coords
-
-pdf_writer = PdfWriter()
-pdf_writer.add_page(left_side_p1)
-pdf_writer.add_page(right_side_p1)
-pdf_writer.add_page(left_side_p2)
-pdf_writer.add_page(right_side_p2)
-
-with open("split.pdf", "wb") as output:
-    pdf_writer.write(output)
+pdf_path = Path().home() / "PycharmProjects" / "Python-exercises-Z2J-" / "Python_Book_Chapter_14" / "rotated.pdf"
+# pdf_reader = PdfReader(str(pdf_path))
+#
+# left_side_p1 = copy.deepcopy(pdf_reader.pages[0])
+# right_side_p1 = copy.deepcopy(pdf_reader.pages[0])
+# left_side_p2 = copy.deepcopy(pdf_reader.pages[1])
+# right_side_p2 = copy.deepcopy((pdf_reader.pages[1]))
+#
+# current_coords = left_side_p1.mediabox.upper_right
+# new_coords = (current_coords[0]/2, current_coords[1])
+#
+# left_side_p1.mediabox.upper_right = new_coords
+# right_side_p1.mediabox.upper_left = new_coords
+# left_side_p2.mediabox.upper_right = new_coords
+# right_side_p2.mediabox.upper_left = new_coords
+#
+# pdf_writer = PdfWriter()
+# pdf_writer.add_page(left_side_p1)
+# pdf_writer.add_page(right_side_p1)
+# pdf_writer.add_page(left_side_p2)
+# pdf_writer.add_page(right_side_p2)
 
 
+## with less code:
 
+pdf_reader_1 = PdfReader(str(pdf_path))
+pdf_writer_1 = PdfWriter()
+
+for page in pdf_reader_1.pages:
+    upper_right_coords = page.mediabox.upper_right
+    center_coords = (upper_right_coords[0] / 2, upper_right_coords[1])
+    left_page = copy.deepcopy(page)
+    right_page = copy.deepcopy(page)
+    left_page.mediabox.upper_right = center_coords
+    right_page.mediabox.upper_left = center_coords
+    pdf_writer_1.add_page(left_page)
+    pdf_writer_1.add_page(right_page)
+
+with open("split_1.pdf", "wb") as output:
+    pdf_writer_1.write(output)
