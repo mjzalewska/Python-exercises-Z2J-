@@ -130,27 +130,7 @@ dmypy.json
 
 # Pycharm settings
 .idea/
-/Python_Book_Chapter_14/blank.pdf
-/Python_Book_Chapter_14/first page.pdf
-/Python_Book_Chapter_14/chapter 1.pdf
-/Python_Book_Chapter_14/chapter 1 slice.pdf
-/Python_Book_Chapter_14/Pride and Prejudice.pdf
-/Python_Book_Chapter_14/last_page.pdf
-/Python_Book_Chapter_14/evey_other_page.pdf
-/Python_Book_Chapter_14/part_1.pdf
-/Python_Book_Chapter_14/part_2.pdf
-/Python_Book_Chapter_14/expense_reports.pdf
-/Python_Book_Chapter_14/PP_1.pdf
-/Python_Book_Chapter_14/PP_2.pdf
-/Python_Book_Chapter_14/full_report.pdf
-/Python_Book_Chapter_14/concatenated.pdf
-/Python_Book_Chapter_14/merged.pdf
-/Python_Book_Chapter_14/ugly_rotated.pdf
-/Python_Book_Chapter_14/cropped_page.pdf
-/Python_Book_Chapter_14/ugly_rotated_ver2.pdf
-/Python_Book_Chapter_14/cropped_pages.pdf
-/Python_Book_Chapter_14/rotated.pdf
-/Python_Book_Chapter_14/split.pdf
-/Python_Book_Chapter_14/split_1.pdf
-/Python_Book_Chapter_14/top_secret_encrypter.pdf
-/Python_Book_Chapter_14/newsletter_protected.pdf
+.pdf
+/Python_Book_Chapter_14/scrambled.pdf
+/Python_Book_Chapter_14/unscrambled.pdf
+/Python_Book_Chapter_14/separate/
