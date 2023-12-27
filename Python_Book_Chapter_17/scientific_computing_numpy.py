@@ -124,5 +124,12 @@ B = A ** 2
 """(4) Use np.vstack() to stack A on top of B, 
 then save the results to an array named C_prime"""
 C_prime = np.vstack([A, B])
-print(C_prime)
+# print(C_prime)
 
+"""(5) Use the @ operator to calculate the matrix product of C by A"""
+prod = C_prime @ A
+# print(prod)
+
+"""(6) Reshape C into an array of dimensions 3 x 3 x 2"""
+new_array = C_prime.reshape(3, 3, 2)
+print(new_array)
