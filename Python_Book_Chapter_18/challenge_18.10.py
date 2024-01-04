@@ -54,7 +54,7 @@ class App(tk.Tk):
         self.lbl_adv.grid(row=5, column=0, sticky="e", padx=8)
         self.ent_adv.grid(row=5, column=1)
         # Generate button
-        self.btn_generate = tk.Button(master=self.frm_generate, text="Generate")
+        self.btn_generate = tk.Button(master=self.frm_generate, text="Generate", command=self.run_app)
         self.btn_generate.grid(row=6, column=1, sticky="ns", pady=5)
         # Results field
         self.lbl_result = tk.Label(master=self.frm_result, text="Your poem: ", pady=10, padx=10)
@@ -63,7 +63,7 @@ class App(tk.Tk):
         self.btn_save = tk.Button(master=self.frm_result, text="Save to file", command=self.export_poem)
         self.btn_save.pack(side=tk.BOTTOM)
 
-    def _validate_num_entries(self, required_elem_num):
+    def _validate_num_entries(self):
         """Checks if the number of entries in the entry field is correct. Returns True if it is and False otherwise"""
         entry_fields = {self.ent_nouns: 3, self.ent_verbs: 3, self.ent_adj: 3, self.ent_adv: 1, self.ent_prep: 3}
         return all(
@@ -92,13 +92,13 @@ class App(tk.Tk):
 
         return [verb_list, noun_list, adj_list, prep_list, adv_list]
 
-    def _draw(self, elem_list, num_elem):
+    def _draw(self, elem_list, num_elem): #change due to max recursion error
         """Draws the required number of unique words"""
-        chosen_elements = [choice(elem_list) for i in range(0, num_elem)]
-        if len(set(chosen_elements)) < 3:
-            self._draw(elem_list, num_elem)
-        else:
+        chosen_elements = [choice(elem_list) for i in range(1, num_elem+1)]
+        if len(set(chosen_elements)) >= 3:
             return chosen_elements
+        else:
+            self._draw(elem_list, 3-len(set(chosen_elements)))
 
     def _generate_poem(self):
         """Randomly selects at least 3 nouns, 3 verbs, 3 adjectives, 3 prepositions and one adverb from the elements
@@ -134,8 +134,11 @@ class App(tk.Tk):
                 poem = self.lbl_result["text"]
                 file.write(poem)
 
-    def main_func(self):
-        pass
+    def run_app(self):
+        if not self._validate_num_entries() or not self._check_duplicates():
+            self._show_warning()
+        else:
+            self._generate_poem()
 
 
 if __name__ == '__main__':
