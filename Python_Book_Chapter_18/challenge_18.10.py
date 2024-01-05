@@ -57,7 +57,7 @@ class App(tk.Tk):
         self.btn_generate = tk.Button(master=self.frm_generate, text="Generate", command=self.run_app)
         self.btn_generate.grid(row=6, column=1, sticky="ns", pady=5)
         # Results field
-        self.lbl_result = tk.Label(master=self.frm_result, text="Your poem: ", pady=10, padx=10)
+        self.lbl_result = tk.Label(master=self.frm_result, pady=10, padx=10)
         self.lbl_result.pack(pady=10)
         # Save as button
         self.btn_save = tk.Button(master=self.frm_result, text="Save to file", command=self.export_poem)
@@ -66,8 +66,15 @@ class App(tk.Tk):
     def _validate_num_entries(self):
         """Checks if the number of entries in the entry field is correct. Returns True if it is and False otherwise"""
         entry_fields = {self.ent_nouns: 3, self.ent_verbs: 3, self.ent_adj: 3, self.ent_adv: 1, self.ent_prep: 3}
-        return all(
-            [False if len(field.get().split(",")) < min_elem else True for field, min_elem in entry_fields.items()])
+        validation = []
+        for field, min_elem in entry_fields.items():
+            if not field.get():
+                validation.append(0)
+            elif field.get() and len(field.get().split(",")) < min_elem:
+                validation.append(0)
+            else:
+                validation.append(1)
+        return all(validation)
 
     def _show_warning(self):
         """Shows a warning if the number of elements in any of the entry fields is below the minimum required number or
@@ -80,8 +87,14 @@ class App(tk.Tk):
     def _check_duplicates(self):
         """Checks duplicates among the words entered by the user. Returns True if duplicates found and False
         otherwise"""
-        return all([(False if word_list.count(item) > 1 else True for item in word_list) for word_list in
-                    self._get_word_lists()])
+        validation = []
+        for word_list in self._get_word_lists():
+            for item in word_list:
+                if word_list.count(item) > 1:
+                    validation.append(1)
+                else:
+                    validation.append(0)
+        return any(validation)
 
     def _get_word_lists(self):
         verb_list = self.ent_verbs.get().split(",")
@@ -92,13 +105,19 @@ class App(tk.Tk):
 
         return [verb_list, noun_list, adj_list, prep_list, adv_list]
 
-    def _draw(self, elem_list, num_elem): #change due to max recursion error
+    def _draw(self, elem_list, num_elem):
         """Draws the required number of unique words"""
-        chosen_elements = [choice(elem_list) for i in range(1, num_elem+1)]
-        if len(set(chosen_elements)) >= 3:
-            return chosen_elements
+        chosen_words = []
+        if len(elem_list) == num_elem:
+            chosen_words = elem_list
         else:
-            self._draw(elem_list, 3-len(set(chosen_elements)))
+            while len(chosen_words) < num_elem:
+                word = choice(elem_list)
+                if word in chosen_words:
+                    continue
+                else:
+                    chosen_words.append(word)
+        return chosen_words
 
     def _generate_poem(self):
         """Randomly selects at least 3 nouns, 3 verbs, 3 adjectives, 3 prepositions and one adverb from the elements
@@ -111,18 +130,20 @@ class App(tk.Tk):
         draw_prep = self._draw(prep, 3)
         draw_adv = self._draw(adv, 1)
 
-        vowels = ["a", "e", "i", "o", "u"]
+        result_header = "Your poem: \n"
 
-        if adj[0][0] in vowels:
-            self.lbl_result = (f"An {draw_adj[0]} {draw_nouns[0]}\n"
-                               f"An {draw_adj[0]} {draw_nouns[0]} {draw_verbs[0]} {draw_prep[0]} the {draw_adj[1]} {draw_nouns[1]}\n"
-                               f"{draw_adv[0]}, the {draw_nouns[0]} {draw_verbs[1]}"
-                               f"the {draw_nouns[1]} {draw_verbs[2]} {draw_prep[1]} a {draw_adj[2]} {draw_nouns[2]}")
+        if draw_adj[0][0] in "aeiou":
+            article = "An"
         else:
-            self.lbl_result = (f"A {draw_adj[0]} {draw_nouns[0]}\n"
-                               f"A {draw_adj[0]} {draw_nouns[0]} {draw_verbs[0]} {draw_prep[0]} the {draw_adj[1]} {draw_nouns[1]}\n"
-                               f"{draw_adv[0]}, the {draw_nouns[0]} {draw_verbs[1]}"
-                               f"the {draw_nouns[1]} {draw_verbs[2]} {draw_prep[1]} a {draw_adj[2]} {draw_nouns[2]}")
+            article = "A"
+
+        self.lbl_result["text"] = ""
+        self.lbl_result["text"] += result_header + (f"\n{article} {draw_adj[0]} {draw_nouns[0]}\n"
+                                                    f"\n{article} {draw_adj[0]} {draw_nouns[0]} {draw_verbs[0]} {draw_prep[0]} "
+                                                    f"the {draw_adj[1]} {draw_nouns[1]}\n"
+                                                    f"{draw_adv[0]}, the {draw_nouns[0]} {draw_verbs[1]} "
+                                                    f"\nthe {draw_nouns[1]} {draw_verbs[2]} {draw_prep[1]} a {draw_adj[2]} "
+                                                    f"{draw_nouns[2]}")
 
     def export_poem(self):
         """Saves the poem as a text file"""
@@ -135,7 +156,7 @@ class App(tk.Tk):
                 file.write(poem)
 
     def run_app(self):
-        if not self._validate_num_entries() or not self._check_duplicates():
+        if self._check_duplicates() or not self._validate_num_entries():
             self._show_warning()
         else:
             self._generate_poem()
@@ -144,3 +165,4 @@ class App(tk.Tk):
 if __name__ == '__main__':
     app = App()
     app.mainloop()
+
